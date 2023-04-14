@@ -2,22 +2,37 @@ import * as sc from "./zh-CN";
 import * as tc from "./zh-TW";
 import * as en from "./en-US";
 import * as jp from "./ja-JP";
+type langData = Record<string, string>;
+const replace = (base: langData, tar: langData) => {
+  for (const key in tar) {
+    if (Object.prototype.hasOwnProperty.call(tar, key)) {
+      const element = tar[key];
+      base[key] = element;
+    }
+  }
+  return base;
+};
 const translate = () => {
   const { language } = navigator;
   const settingLanguage = localStorage.getItem("language");
   const lang = settingLanguage || language;
+  let data: langData = {};
+  data = replace(data, sc.default);
   switch (lang) {
     case "zh-CN":
-      return sc.default;
+      break;
     case "zh-TW":
-      return tc.default;
+      data = replace(data, tc.default);
+      break;
     case "en-US":
-      return en.default;
+      data = replace(data, en.default);
+      break;
     case "ja-JP":
-      return jp.default;
+      data = replace(data, jp.default);
+      break;
     default:
       console.error("Unknown language");
-      return sc.default;
   }
+  return data;
 };
 export default translate;

@@ -1,7 +1,8 @@
 <!-- 空白div占位400*300 -->
 <script lang="ts">
-import Swpf from './Swpf.vue'
-import About from './About.vue'
+import Swpf from './swpf.vue'
+import About from './about.vue'
+import Home from './home.vue'
 export default {
     components: {
         Swpf, About
@@ -28,7 +29,7 @@ export default {
                 case '#about':
                     return About;
                 default:
-                    return Swpf;
+                    return Home;
             }
         },
     },
