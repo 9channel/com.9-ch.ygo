@@ -3,20 +3,31 @@
 export default {
     data() {
         return {
-            lang: localStorage.getItem('language') || 'zh-CN'
+            lang: 'language'
         }
     },
     watch: {
         lang() {
-            localStorage.setItem('language', this.lang)
-            // 重新加载页面
-            window.location.reload()
+            if (this.lang != 'language') {
+                const old = localStorage.getItem('language');
+                if (old == this.lang) {
+                    this.lang = 'language';
+                    return;
+                }
+                localStorage.setItem('language', this.lang);
+                this.lang = 'language';
+                window.location.reload();
+            }
         }
     }
 }
 </script>
 <template>
+    <!-- 下拉选择语言-->
     <select v-model="lang">
+        <!-- language 隐藏 -->
+        <option value="language" style="display: none;">Language</option>
+        <!-- 绑定到change -->
         <option value="zh-CN">简体中文</option>
         <option value="zh-TW">繁体中文</option>
         <option value="ja-JP">日本語</option>
