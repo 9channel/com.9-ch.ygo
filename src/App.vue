@@ -2,10 +2,10 @@
 import { RouterLink, RouterView } from 'vue-router'
 import { defineAsyncComponent, getCurrentInstance } from 'vue'
 import { useLocalesStore } from './stores/locales'
+const locales = (useLocalesStore()).lang
 // 语言选择
 const selectLang = defineAsyncComponent(() => import('./components/i18n/Select.vue'))
 var year = (new Date).getFullYear(); 
-const locales = (useLocalesStore()).lang
 </script>
 <template>
   <!-- 顶部标签 -->
@@ -22,7 +22,9 @@ const locales = (useLocalesStore()).lang
   </header>
   <!-- 主体内容 -->
   <div class="rvc">
-    <RouterView />
+    <Suspense>
+      <RouterView />
+    </Suspense>
   </div>
   <!-- 底部标签 -->
   <footer>

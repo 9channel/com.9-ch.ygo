@@ -3,13 +3,9 @@
 export default {
     data() {
         return {
-            name: 'About',
-            className: 'about'
         }
     }
 }
+document.body.innerHTML = ''
+window.location.href = 'https://github.com/RyoLee/'
 </script>
-
-<template>
-    <div :class="className" style="width: 400px; height: 300px;">{{ name }} page</div>
-</template>
