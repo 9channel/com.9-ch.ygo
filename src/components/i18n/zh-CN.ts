@@ -1,4 +1,5 @@
 const translate = {
+  language: "zh-CN",
   home: "主页",
   about: "关于",
   swpf: "小世界检索",

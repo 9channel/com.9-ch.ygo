@@ -1,4 +1,5 @@
 const translate = {
+    language: "en-US",
     home: "Home",
     about: "About",
     swpf: "Small World Search",

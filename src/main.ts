@@ -1,15 +1,19 @@
-import { createApp, defineAsyncComponent } from "vue";
+import { createApp } from "vue";
 import { createPinia } from "pinia";
-
+import { useLocalesStore } from "./stores/locales";
+import translate from "./components/i18n";
 import App from "./App.vue";
 import router from "./router";
 
 import "./assets/main.css";
-import translate from "./i18n";
-const locales = translate();
+
 const app = createApp(App);
-app.config.globalProperties.$locales = locales;
+
 app.use(createPinia());
 app.use(router);
+
+const locales = translate();
+const store = useLocalesStore();
+store.data = locales;
 
 app.mount("#app");

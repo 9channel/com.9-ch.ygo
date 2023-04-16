@@ -1,4 +1,5 @@
 const translate = {
+  language: "ja-JP",
   home: "ホーム",
   about: "約",
   swpf: "スモール・ワールドの検索",

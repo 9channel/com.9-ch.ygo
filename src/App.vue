@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import { defineAsyncComponent, getCurrentInstance, defineComponent } from 'vue'
-const locales = getCurrentInstance()!.appContext.config.globalProperties.$locales;
+import { defineAsyncComponent, getCurrentInstance } from 'vue'
+import { useLocalesStore } from './stores/locales'
 // 语言选择
-const selectLang = defineAsyncComponent(() => import('./i18n/select.vue'))
+const selectLang = defineAsyncComponent(() => import('./components/i18n/Select.vue'))
 var year = (new Date).getFullYear(); 
+const locales = (useLocalesStore()).lang
 </script>
 <template>
   <!-- 顶部标签 -->
@@ -13,6 +14,7 @@ var year = (new Date).getFullYear();
     <nav>
       <RouterLink to="/">{{ locales.home }}</RouterLink>
       <RouterLink to="/swpf">{{ locales.swpf }}</RouterLink>
+      <RouterLink to="/ttl">{{ locales.ttl }}</RouterLink>
       <RouterLink to="/about">{{ locales.about }}</RouterLink>
       <select-lang />
     </nav>
@@ -25,7 +27,8 @@ var year = (new Date).getFullYear();
   <!-- 底部标签 -->
   <footer>
     <div>
-      ©{{ year }} <a href="https://blog.9-ch.com">9 Channel</a> All rights reserved
+      ©{{ year }}
+      <a href="https://9-ch.com">9 Channel</a> All rights reserved
     </div>
     <div>
       Powered by <a href="https://vuejs.org">Vue 3.0</a>
@@ -98,6 +101,10 @@ footer {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+footer div {
+  margin: 0 1rem;
 }
 
 @media (min-width: 1024px) {

@@ -19,7 +19,21 @@ export default {
                 window.location.reload();
             }
         }
+    },
+    // 加载后对当前语言option前加上"√"
+    mounted() {
+        const lang = localStorage.getItem('language');
+        if (lang) {
+            const options = document.getElementsByTagName('option');
+            for (let i = 0; i < options.length; i++) {
+                if (options[i].value == lang) {
+                    options[i].innerHTML = '√ ' + options[i].innerHTML;
+                    break;
+                }
+            }
+        }
     }
+    
 }
 </script>
 <template>

@@ -2,7 +2,7 @@ import * as sc from "./zh-CN";
 import * as tc from "./zh-TW";
 import * as en from "./en-US";
 import * as jp from "./ja-JP";
-type langData = Record<string, string>;
+export type langData = Record<string, string>;
 const replace = (base: langData, tar: langData) => {
   for (const key in tar) {
     if (Object.prototype.hasOwnProperty.call(tar, key)) {
