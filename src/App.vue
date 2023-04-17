@@ -1,32 +1,36 @@
 <script setup lang="ts">
-import { defineAsyncComponent, getCurrentInstance, defineComponent } from 'vue'
-const locales = getCurrentInstance()!.appContext.config.globalProperties.$locales;
-const manPage = defineAsyncComponent(() => import('./components/main.vue'))
+import { RouterLink, RouterView } from 'vue-router'
+import { defineAsyncComponent, getCurrentInstance } from 'vue'
+import { useLocalesStore } from './stores/locales'
+const locales = (useLocalesStore()).lang
 // 语言选择
-const selectLang = defineAsyncComponent(() => import('./i18n/select.vue'))
+const selectLang = defineAsyncComponent(() => import('./components/i18n/Select.vue'))
 var year = (new Date).getFullYear(); 
 </script>
 <template>
   <!-- 顶部标签 -->
   <header>
-    <div class="nav">
-      <a href="#">{{ locales.home }}</a>
-      <!-- 点击显示对应页面, 默认为Swpf-->
-      <a href="#swpf">{{ locales.swpf }}</a>
-      <a href="#about">{{ locales.about }}</a>
-      <!-- 下拉选择语言 -->
+    <img alt="Site logo" class="logo" src="@/assets/logo.png" width="72" height="72" />
+    <nav>
+      <RouterLink to="/">{{ locales.home }}</RouterLink>
+      <RouterLink to="/swpf">{{ locales.swpf }}</RouterLink>
+      <RouterLink to="/ttl">{{ locales.ttl }}</RouterLink>
+      <RouterLink to="/about">{{ locales.about }}</RouterLink>
       <select-lang />
-    </div>
+    </nav>
+    <!-- 下拉选择语言 -->
   </header>
   <!-- 主体内容 -->
-  <main>
-    <!-- 绑定manPage -->
-    <component :is="manPage" />
-  </main>
+  <div class="rvc">
+    <Suspense>
+      <RouterView />
+    </Suspense>
+  </div>
   <!-- 底部标签 -->
   <footer>
     <div>
-      ©{{ year }} <a href="https://blog.9-ch.com">9 Channel</a> All rights reserved
+      ©{{ year }}
+      <a href="https://9-ch.com">9 Channel</a> All rights reserved
     </div>
     <div>
       Powered by <a href="https://vuejs.org">Vue 3.0</a>
@@ -35,11 +39,57 @@ var year = (new Date).getFullYear();
 </template>
 
 <style scoped>
-/* header位于浏览器顶部，水平方向铺满 */
 header {
+  line-height: 1.5;
+  max-height: 100vh;
+}
+
+.logo {
+  display: block;
+  margin: 0 auto 2rem;
+}
+
+nav {
   width: 100%;
-  height: 50px;
-  background-color: #eee;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+nav a.router-link-exact-active {
+  color: var(--color-text);
+}
+
+nav a.router-link-exact-active:hover {
+  background-color: transparent;
+}
+
+nav a {
+  display: inline-block;
+  padding: 0 1rem;
+  border-left: 1px solid var(--color-border);
+}
+
+nav a:first-of-type {
+  border: 0;
+}
+
+
+/* 下拉框透明背景无边框 */
+select {
+  display: inline-block;
+  padding: 0 1rem;
+  background-color: transparent;
+  border: none;
+  width: 120px;
+  color: #000;
+  font-size: 14px;
+  outline: none;
+}
+
+/* main位于垂直方向的中间，最小高度要求header+footer+main铺满 */
+.rvc {
+  min-height: calc(100vh - 122px - 50px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -56,49 +106,31 @@ footer {
 }
 
 footer div {
-  margin: 0 10px;
+  margin: 0 1rem;
 }
 
-footer a {
-  margin: 0 5px;
-}
+@media (min-width: 1024px) {
+  header {
+    display: flex;
+    place-items: center;
+    padding-right: calc(var(--section-gap) / 2);
+  }
 
-/* 下拉框透明背景无边框 */
-select {
-  background-color: transparent;
-  border: none;
-  width: 100px;
-  height: 30px;
-  border-radius: 5px;
-  color: #000;
-  font-size: 14px;
-  outline: none;
-}
+  .logo {
+    margin: 0 2rem 0 0;
+  }
 
-/* main位于垂直方向的中间，最小高度要求header+footer+main铺满 */
-main {
-  min-height: calc(100vh - 100px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+  nav {
+    text-align: right;
+    margin-left: -1rem;
+    font-size: 1rem;
 
-/* 导航栏 */
-.nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin: 0 20px;
-}
+    padding: 1rem 0;
+    margin-top: 1rem;
+  }
 
-.nav a {
-  text-decoration: none;
-  width: 10%;
-  color: #000;
-}
-
-.nav a:hover {
-  color: #f00;
+  .rvc {
+    min-height: calc(100vh - 72px - 50px);
+  }
 }
 </style>
