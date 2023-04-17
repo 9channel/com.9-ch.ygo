@@ -384,7 +384,7 @@ export default {
 }
 </script>
 <template>
-    <div>
+    <div class="mainDiv">
         <div class="options">
             <div>
                 <!-- 保存默认卡组按钮 -->
@@ -415,6 +415,11 @@ export default {
     </div>
 </template>
 <style scoped>
+.mainDiv {
+    max-width: 590px;
+    width: 100%;
+}
+
 .options {
     display: flex;
     flex-direction: row;
