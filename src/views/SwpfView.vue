@@ -188,7 +188,7 @@ export default {
             let selectedDeck = {} as GuCardsType
             if (this.selectedDeckName) {
                 let deck = this.decks.find((deck: deckType) => deck.name === this.selectedDeckName) as deckType
-                const idSet = new Set()
+                const idSet = new Set() as Set<number>
                 const allCardIds = await (await fetch('/id/all.json?v=' + this.serverVer)).json()
                 for (let card of deck.cards) {
                     let id = card.id as number
@@ -197,37 +197,52 @@ export default {
                         continue
                     }
                     idSet.add(id)
+                }
+                // idSet 通过 fillter筛选
+                const idList = [] as number[]
+                for (let id of idSet) {
+                    // 添加到idList
+                    idList.push(id)
+                }
+                const idFillter = async (id: number) => {
                     // 获取卡片信息 /id/$id.json 同步调用, 文件可能不存在
                     // 先判断文件是否存在，再调用
                     if (!allCardIds.includes(id)) {
-                        continue
+                        return null;
                     }
                     const guCard = await (await fetch('/id/' + id + '.json?v=' + this.serverVer)).json() as GuCardType
                     if (!guCard.text) {
-                        continue
+                        return null;
                     }
                     const rawType = guCard.text.types
                     // 去除rawType不包含"怪兽"的卡片
                     if (!rawType.includes('怪兽')) {
-                        continue
+                        return null;
                     }
                     // 去除rawType包含"融合"的卡片
                     if (rawType.includes('融合')) {
-                        continue
+                        return null;
                     }
                     // 去除rawType包含"同调"的卡片
                     if (rawType.includes('同调')) {
-                        continue
+                        return null;
                     }
                     // 去除rawType包含"超量"的卡片
                     if (rawType.includes('超量')) {
-                        continue
+                        return null;
                     }
                     // 去除rawType包含"连接"的卡片
                     if (rawType.includes('连接')) {
-                        continue
+                        return null;
                     }
-                    selectedDeck[card.id] = guCard
+                    return guCard;
+                }
+                const filltedRes = await Promise.all(idList.map(idFillter))
+                // 去除null, 添加到selectedDeck,key为id, value为guCard
+                for (let guCard of filltedRes) {
+                    if (guCard) {
+                        selectedDeck[guCard.id] = guCard
+                    }
                 }
                 this.selectedDeck = selectedDeck
             }
