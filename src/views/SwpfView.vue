@@ -189,6 +189,7 @@ export default {
             if (this.selectedDeckName) {
                 let deck = this.decks.find((deck: deckType) => deck.name === this.selectedDeckName) as deckType
                 const idSet = new Set()
+                const allCardIds = await (await fetch('/id/all.json?v=' + this.serverVer)).json()
                 for (let card of deck.cards) {
                     let id = card.id as number
                     // 去重
@@ -198,11 +199,10 @@ export default {
                     idSet.add(id)
                     // 获取卡片信息 /id/$id.json 同步调用, 文件可能不存在
                     // 先判断文件是否存在，再调用
-                    const allCardIds = await (await fetch('/id/all.json')).json()
                     if (!allCardIds.includes(id)) {
                         continue
                     }
-                    const guCard = await (await fetch('/id/' + id + '.json')).json() as GuCardType
+                    const guCard = await (await fetch('/id/' + id + '.json?v=' + this.serverVer)).json() as GuCardType
                     if (!guCard.text) {
                         continue
                     }
@@ -337,10 +337,10 @@ export default {
             this.tCard = -1
             return
         },
-        async mounted() {
-            await this.updateSelectedDeck()
-        }
-    }
+    },
+    mounted() {
+        this.updateSelectedDeck()
+    },
 }
 </script>
 <template>
