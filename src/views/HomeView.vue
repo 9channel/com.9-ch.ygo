@@ -14,7 +14,7 @@ export default {
 <template>
     <main>
         <h1>
-            Yo-Gi-Oh! Tools
+            Yu-Gi-Oh! Tools
         </h1>
         <p>{{ locales.siteInfo }}</p>
     </main>
