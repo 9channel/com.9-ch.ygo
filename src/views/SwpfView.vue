@@ -51,9 +51,9 @@ export default {
             decks: [] as deckType[],
             selectedDeckName: '' as string,
             selectedDeck: {} as GuCardsType,
-            allCards: {},
             hCard: -1,
             tCard: -1,
+            serverVer: "",
         }
     },
     async setup() {
@@ -68,65 +68,17 @@ export default {
                 localStorage.setItem('defaultDeck', selectedDeckName)
             }
         }
+
         // 内容为带有引号的字符串，如："1234567890abcdef1234567890abcdef"
         // 时间戳，用于清除缓存
         const t = '?t=' + Date.now()
-        let serverVer = await (await (await fetch('/cards.zip.md5' + t)).text()).replace(/"/g, '')
-        const allRawCards = await (await fetch('/cards.json?v=' + serverVer)).json() as unknown as GuCardsType
-        const allCards = {} as GuCardsType
-        Object.keys(allRawCards).forEach((key: string) => {
-            const card = allRawCards[key]
-            allCards[card.id] = card
-        })
-
-        let selectedDeck = {} as GuCardsType
-        if (selectedDeckName) {
-            let deck = decks.find((deck: deckType) => deck.name === selectedDeckName) as deckType
-            const idSet = new Set()
-            const cards = deck.cards.filter((card: cardType) => {
-                // 去重
-                if (idSet.has(card.id)) {
-                    return false
-                }
-                if (!allCards[card.id] || !allCards[card.id].text) {
-                    return false
-                }
-                const rawType = allCards[card.id].text.types
-                // 去除rawType不包含"怪兽"的卡片
-                if (!rawType.includes('怪兽')) {
-                    return false
-                }
-                // 去除rawType包含"融合"的卡片
-                if (rawType.includes('融合')) {
-                    return false
-                }
-                // 去除rawType包含"同调"的卡片
-                if (rawType.includes('同调')) {
-                    return false
-                }
-                // 去除rawType包含"超量"的卡片
-                if (rawType.includes('超量')) {
-                    return false
-                }
-                // 去除rawType包含"连接"的卡片
-                if (rawType.includes('连接')) {
-                    return false
-                }
-                idSet.add(card.id)
-                return true
-            })
-            // 生成selectedDeck
-            cards.forEach((card: cardType) => {
-                selectedDeck[card.id] = allCards[card.id]
-            })
-        }
+        const serverVer = await (await (await fetch('/cards.zip.md5' + t)).text()).replace(/"/g, '')
         return {
             decks,
             selectedDeckName,
-            selectedDeck,
-            allCards,
             hCard: -1,
             tCard: -1,
+            serverVer,
         }
     },
     methods: {
@@ -231,49 +183,67 @@ export default {
             // 将当期选中的卡组设为默认卡组
             localStorage.setItem('defaultDeck', this.selectedDeckName)
         },
-        updateSelectedDeck() {
+        async updateSelectedDeck() {
             // id去重
             let selectedDeck = {} as GuCardsType
             if (this.selectedDeckName) {
                 let deck = this.decks.find((deck: deckType) => deck.name === this.selectedDeckName) as deckType
-                const idSet = new Set()
-                const cards = deck.cards.filter((card: cardType) => {
+                const idSet = new Set() as Set<number>
+                const allCardIds = await (await fetch('/id/all.json?v=' + this.serverVer)).json()
+                for (let card of deck.cards) {
                     let id = card.id as number
                     // 去重
                     if (idSet.has(id)) {
-                        return false
+                        continue
                     }
                     idSet.add(id)
-                    if (!this.allCards[id] || !this.allCards[id].text) {
-                        return false
+                }
+                // idSet 通过 fillter筛选
+                const idList = [] as number[]
+                for (let id of idSet) {
+                    // 添加到idList
+                    idList.push(id)
+                }
+                const idFillter = async (id: number) => {
+                    // 获取卡片信息 /id/$id.json 同步调用, 文件可能不存在
+                    // 先判断文件是否存在，再调用
+                    if (!allCardIds.includes(id)) {
+                        return null;
                     }
-                    const rawType = this.allCards[card.id].text.types
+                    const guCard = await (await fetch('/id/' + id + '.json?v=' + this.serverVer)).json() as GuCardType
+                    if (!guCard.text) {
+                        return null;
+                    }
+                    const rawType = guCard.text.types
                     // 去除rawType不包含"怪兽"的卡片
                     if (!rawType.includes('怪兽')) {
-                        return false
+                        return null;
                     }
                     // 去除rawType包含"融合"的卡片
                     if (rawType.includes('融合')) {
-                        return false
+                        return null;
                     }
                     // 去除rawType包含"同调"的卡片
                     if (rawType.includes('同调')) {
-                        return false
+                        return null;
                     }
                     // 去除rawType包含"超量"的卡片
                     if (rawType.includes('超量')) {
-                        return false
+                        return null;
                     }
                     // 去除rawType包含"连接"的卡片
                     if (rawType.includes('连接')) {
-                        return false
+                        return null;
                     }
-                    return true
-                })
-                // 生成selectedDeck
-                cards.forEach((card: cardType) => {
-                    selectedDeck[card.id] = this.allCards[card.id]
-                })
+                    return guCard;
+                }
+                const filltedRes = await Promise.all(idList.map(idFillter))
+                // 去除null, 添加到selectedDeck,key为id, value为guCard
+                for (let guCard of filltedRes) {
+                    if (guCard) {
+                        selectedDeck[guCard.id] = guCard
+                    }
+                }
                 this.selectedDeck = selectedDeck
             }
             // 重新渲染.cards
@@ -288,8 +258,8 @@ export default {
                     cardDiv.classList.remove('pCard')
                 }
             }
-            const h = this.allCards[this.hCard]
-            const t = this.allCards[this.tCard]
+            const h = this.selectedDeck[this.hCard]
+            const t = this.selectedDeck[this.tCard]
             // selectedDeck遍历，exactly_one_equal判断
             for (let id in this.selectedDeck) {
                 const card = this.selectedDeck[id]
@@ -300,8 +270,6 @@ export default {
                     }
                 }
             }
-
-
         },
         exactly_one_equal(c1: GuCardType, c2: GuCardType) {
             let similar_attrs = 0
@@ -383,8 +351,11 @@ export default {
             this.hCard = -1
             this.tCard = -1
             return
-        }
-    }
+        },
+    },
+    mounted() {
+        this.updateSelectedDeck()
+    },
 }
 </script>
 <template>

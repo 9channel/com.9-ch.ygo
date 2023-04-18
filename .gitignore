@@ -26,3 +26,7 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+
+public/id/**
+public/cards.json
+public/cards.zip.md5
