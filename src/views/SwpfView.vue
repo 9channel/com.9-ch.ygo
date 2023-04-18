@@ -1,6 +1,7 @@
 <!-- 空白div占位400*300 -->
 <script lang="ts">
 import { useLocalesStore } from '@/stores/locales'
+import YgoCardDiv from '@/components/view/YgoCardDiv.vue';
 const locales = (useLocalesStore()).lang
 export type cardType = {
     type: number, // 0: main deck, 1: extra deck, 2: side deck
@@ -42,6 +43,9 @@ export type GuCardsType = {
     [key: string]: GuCardType
 }
 export default {
+    components: {
+        YgoCardDiv
+    },
     data() {
         return {
             decks: [] as deckType[],
@@ -407,16 +411,16 @@ export default {
         </div>
         <!-- 卡组列表 -->
         <div class="cards">
-            <div v-for="card in selectedDeck" :key="card.id" @click="cardClick(card.id)" :id="`card-${card.id}`">
-                <img class="cardImg" :src="`https://cdn.233.momobako.com/ygopro/pics/${card.id}.jpg`"
-                    :alt="`${card.cid}`" />
+            <div class="cardDiv" v-for="card in selectedDeck" :key="card.id" @click="cardClick(card.id)"
+                :id="`card-${card.id}`">
+                <YgoCardDiv :cid="card.id" :size="94" />
             </div>
         </div>
     </div>
 </template>
 <style scoped>
 .mainDiv {
-    max-width: 590px;
+    max-width: 500px;
     width: 100%;
 }
 
@@ -444,32 +448,33 @@ export default {
 
 .cards {
     display: flex;
-    max-width: 590px;
-    max-height: 516px;
+    max-width: 500px;
     flex-wrap: wrap;
     align-items: flex-start;
 }
 
-.cards>div {
-    width: 118px;
-    height: 172px;
-    border: 1px solid black;
+.cardDiv {
+    width: 100px;
+    height: 100px;
+    /* 中心对齐 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    border-color: transparent;
+    border-style: solid;
+    box-sizing: border-box;
 }
 
-.cardImg {
-    width: 100%;
-    height: 100%;
+.hCard {
+    border-color: rgb(0, 255, 0);
 }
 
-.cards>.hCard {
-    border: 8px solid rgb(0, 255, 0);
+.tCard {
+    border-color: rgb(0, 0, 255);
 }
 
-.cards>.tCard {
-    border: 8px solid rgb(0, 0, 255);
-}
-
-.cards>.pCard {
-    border: 8px solid rgb(255, 0, 0);
+.pCard {
+    border-color: rgb(255, 0, 0);
 }
 </style>

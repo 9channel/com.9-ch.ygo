@@ -1,22 +1,26 @@
 <!-- 空白div占位400*300 -->
 <script lang="ts">
 import { useLocalesStore } from '@/stores/locales'
+import YgoCardDiv from '../components/view/YgoCardDiv.vue';
 const locales = useLocalesStore().lang
 export default {
+    components: {
+        YgoCardDiv
+    },
     data() {
         return {
             isDual: false,
             cards: [
-                74078255,
-                37961969,
-                572850,
-                73956664,
-                6767771,
-                92731385,
-                84330567,
-                28226490,
-                74920585,
-                1329620,
+                { id: 74078255, mode: 2 },
+                { id: 37961969, mode: 2 },
+                { id: 572850, mode: 2 },
+                { id: 73956664, mode: 2 },
+                { id: 6767771, mode: 2 },
+                { id: 92731385, mode: 3 },
+                { id: 84330567, mode: 2 },
+                { id: 28226490, mode: 2 },
+                { id: 74920585, mode: 2 },
+                { id: 1329620, mode: 2 }
             ],
             locales
         }
@@ -33,26 +37,11 @@ export default {
             localStorage.setItem('isDual', JSON.parse(this.isDual))
             this.$forceUpdate()
         },
-        switchDiv(e: Event) {
-            // 绑定div的点击事件
-            // 切换opacity 0/0.5
-            const div = e.target as HTMLDivElement
-            if (div.style.opacity as unknown as number < 0.5) {
-                div.style.opacity = "0.6"
-            } else {
-                div.style.opacity = "0"
-            }
-        },
         clearAllDiv() {
             // 清除所有div的opacity
-            const oDivs = document.getElementsByClassName("oef")
-            const sDivs = document.getElementsByClassName("sef")
-            for (let i = 0; i < oDivs.length; i++) {
-                const div = oDivs[i] as HTMLDivElement
-                div.style.opacity = "0"
-            }
-            for (let i = 0; i < sDivs.length; i++) {
-                const div = sDivs[i] as HTMLDivElement
+            const efDivs = document.getElementsByClassName("efMark")
+            for (let i = 0; i < efDivs.length; i++) {
+                const div = efDivs[i] as HTMLDivElement
                 div.style.opacity = "0"
             }
         }
@@ -61,12 +50,9 @@ export default {
 </script>
 <template>
     <div class="mainDiv">
-        <div class="other" v-if="isDual">
-            <!-- 背景为拼接：https://cdn.233.momobako.com/ygopro/pics/+id+.jpg -->
-            <div v-for="id in cards" :key="id"
-                :style="`background-image: url(https://cdn.233.momobako.com/ygopro/pics/${id}.jpg)`">
-                <div class="oef ef1" :key="id" @click="switchDiv">①</div>
-                <div class="oef ef2" :key="id" @click="switchDiv">②</div>
+        <div class="deck" v-if="isDual">
+            <div class="ygoCardDiv" :size="100" v-for="card in cards" :key="card.id">
+                <YgoCardDiv :cid="card.id" :size="94" :skill-mode="card.mode" />
             </div>
         </div>
         <div class="options">
@@ -75,90 +61,41 @@ export default {
             <!-- 清除按钮 -->
             <button v-on:click="clearAllDiv">{{ locales.clearAllMark }}</button>
         </div>
-        <div class="self">
-            <div v-for="id in cards" :key="id"
-                :style="`background-image: url(https://cdn.233.momobako.com/ygopro/pics/${id}.jpg)`">
-                <div class="sef ef1" :key="id" @click="switchDiv">①</div>
-                <div class="sef ef2" :key="id" @click="switchDiv">②</div>
+        <div class="deck">
+            <div class="ygoCardDiv" :size="100" v-for="card in cards" :key="card.id">
+                <YgoCardDiv :cid="card.id" :size="94" :skill-mode="card.mode" />
             </div>
         </div>
     </div>
 </template>
 <style scoped>
+.ygoCardDiv {
+    border-color: transparent;
+    border-style: solid;
+    box-sizing: border-box;
+    width: 100px;
+}
+
 .mainDiv {
-    max-width: 590px;
+    max-width: 500px;
     width: 100%;
+}
+
+.deck {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    max-width: 500px;
 }
 
 .options {
     width: 100%;
-    height: 100px;
+    height: 50px;
     border: 1px solid black;
 }
 
 .options button {
     width: 50%;
     height: 100%;
-}
-
-.other {
-    display: flex;
-    max-width: 590px;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    /* 垂直镜像 */
-    transform: scaleY(-1);
-}
-
-.self {
-    display: flex;
-    max-width: 590px;
-    flex-wrap: wrap;
-    align-items: flex-start;
-}
-
-.other>div {
-    width: 118px;
-    height: 172px;
-    border: 1px solid black;
-    background-size: 100%;
-}
-
-.oef {
-    width: 100%;
-    height: 50%;
-    /* 文本水平居中 */
-    /*flex 布局*/
-    display: flex;
-    /*实现垂直居中*/
-    align-items: center;
-    /*实现水平居中*/
-    justify-content: center;
-    font-size: 40px;
-    opacity: 0;
-    background-color: aqua;
-    transform: scaleY(-1);
-}
-
-.sef {
-    width: 100%;
-    height: 50%;
-    /* 文本水平居中 */
-    /*flex 布局*/
-    display: flex;
-    /*实现垂直居中*/
-    align-items: center;
-    /*实现水平居中*/
-    justify-content: center;
-    font-size: 40px;
-    opacity: 0;
-    background-color: aqua;
-}
-
-.self>div {
-    width: 118px;
-    height: 172px;
-    border: 1px solid black;
-    background-size: 100%;
 }
 </style>
