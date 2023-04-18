@@ -104,7 +104,6 @@ export default {
 .other {
     display: flex;
     max-width: 590px;
-    max-height: 516px;
     flex-wrap: wrap;
     align-items: flex-start;
     /* 垂直镜像 */
@@ -114,7 +113,6 @@ export default {
 .self {
     display: flex;
     max-width: 590px;
-    max-height: 516px;
     flex-wrap: wrap;
     align-items: flex-start;
 }
