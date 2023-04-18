@@ -27,7 +27,6 @@ coverage
 *.sln
 *.sw?
 
-public/cid/**
 public/id/**
 public/cards.json
 public/cards.zip.md5

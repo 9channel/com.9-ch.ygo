@@ -13,34 +13,21 @@ def main():
     unzip('public/cards.zip', 'public/', 'cards.json')
     deleteFile('public/cards.zip')
     deleteFolder('public/id')
-    deleteFolder('public/cid')
     createFolder('public/id')
-    createFolder('public/cid')
     with open('public/cards.json', encoding="utf-8") as f:
         data = json.load(f)
     ids = set()
-    cids = set()
     for key in data:
         id = str(data[key]['id'])
         ids.add(id)
         id_path = 'public/id/' + id + '.json'
         with open(id_path, 'w', encoding="utf-8") as f:
             json.dump(data[key], f, ensure_ascii=False)
-        cid = str(data[key]['cid'])
-        cids.add(cid)
-        cid_path = 'public/cid/' + cid + '.json'
-        with open(cid_path, 'w', encoding="utf-8") as f:
-            json.dump(data[key], f, ensure_ascii=False)
     deleteFile('public/id/0.json')
-    deleteFile('public/cid/0.json')
     if '0' in ids:
         ids.remove('0')
-    if '0' in cids:
-        cids.remove('0')
     with open('public/id/all.json', 'w', encoding="utf-8") as f:
         json.dump(list(ids), f, ensure_ascii=False)
-    with open('public/cid/all.json', 'w', encoding="utf-8") as f:
-        json.dump(list(cids), f, ensure_ascii=False)
 
 
 def download(url, save_path):
