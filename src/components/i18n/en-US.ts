@@ -7,6 +7,6 @@ const translate = {
   ttl: "Tearlaments Record",
   overridMsg: "Deck {deckName} already exists, overwrite?",
   switchDualMode: "Switch Duel Mode",
-  clearAllMark: "Clear All Mark",
+  clearAllMark: "Clear All Marks",
 };
 export default translate;
